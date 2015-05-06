@@ -147,9 +147,9 @@ rules:
   messages:
     $message:
       title:
-       #.read: data.parent().child('settings/private').val() ==== false
+       #.read: data.parent().child('settings').child('private').val() ==== false
         .read: ^$message.settings.private === false
-       #.write: newData.parent().child('settings/private').val() ==== false
+       #.write: newData.parent().child('settings').child('private').val() ==== false
         .write: ^$message(next).settings.private === false
       settings:
         private:
