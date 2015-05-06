@@ -15,9 +15,10 @@ npm install -g butane
 Create a `rules.yml` containing the following code:
 
 ```yaml
+.functions:
+  isAuthed(): auth !== null
+
 rules:
-  .functions:
-    isAuthed(): auth !== null
   .read: isAuthed()
   .write: isAuthed()
 ```
@@ -43,8 +44,8 @@ Common expressions for reuse are defined in the `.functions` list.
 
 ```yaml
 .functions:
-  - isLoggedIn():      auth.username !== null
-  - isUser(username):  auth.username === username
+  isLoggedIn():  auth.uid !== null
+  isUser(user):  auth.uid === user
 ```
 
 You can then use them anywhere a security expression would be expected.
