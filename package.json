@@ -16,7 +16,8 @@
   },
   "scripts": {
     "test": "mocha --compilers js:babel/register test/*.js",
-    "dist": "rm -rf dist && babel lib --out-dir dist"
+    "dist": "rm -rf dist && babel lib --out-dir dist",
+    "prepublish": "npm run dist"
   },
   "dependencies": {
     "js-yaml": "3.3.0",
