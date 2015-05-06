@@ -155,8 +155,8 @@ rules:
           .validate: next.isBoolean()
 ```
 
-[npm-url]: https://npmjs.org/package/react-navigation-controller
-[npm-image]: http://img.shields.io/npm/v/react-navigation-controller.svg
+[npm-url]: https://npmjs.org/package/butane
+[npm-image]: http://img.shields.io/npm/v/butane.svg
 
-[travis-url]: https://travis-ci.org/aputinski/react-navigation-controller
-[travis-image]: http://img.shields.io/travis/aputinski/react-navigation-controller.svg
+[travis-url]: https://travis-ci.org/aputinski/butane
+[travis-image]: http://img.shields.io/travis/aputinski/butane.svg
