@@ -1,0 +1,37 @@
+{
+  "rules": {
+    "cards": {
+      ".read": "auth !== null"
+    },
+    "games": {
+      "$game": {
+        "__timestamp": {
+          ".read": "newData.val() === 12345",
+          ".write": true
+        },
+        "cards": {
+          ".read": "root.child('games').child($game).child('players').hasChild(auth.uid)",
+          ".write": "root.child('games').child($game).child('players').hasChild(auth.uid)"
+        },
+        "players": {
+          "$player": {
+            ".read": "root.child('games').child($game).child('players').hasChild(auth.uid)",
+            ".write": "root.child('games').hasChild($game) && data.parent().parent().child('settings/started').val() === false && $player == auth.uid && (!data.exists() || newData.val() === true) && newData.exits()",
+            "name": {
+              ".validate": "newData.isString()"
+            },
+            "cards": {
+              ".write": "$player === auth.uid"
+            }
+          }
+        },
+        "player-names": {
+          ".read": "root.child('games').child($game).child('players').hasChild(auth.uid)",
+          "$player": {
+            ".write": "auth !== null && (!root.child('games').child($game).child('players').hasChild(auth.uid) || root.child('games').child($game).child('players').child(auth.uid).val() === true) && !data.exists() && newData.exists()"
+          }
+        }
+      }
+    }
+  }
+}
