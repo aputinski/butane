@@ -5,6 +5,10 @@
   "keywords": [
     "firebase"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:aputinski/butane.git"
+  },
   "author": "Adam Putinski",
   "main": "dist/index.js",
   "bin": {
