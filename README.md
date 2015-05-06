@@ -110,12 +110,12 @@ rules:
       .refs:
         myMessageRef: prev
       title:
-       #.read: "data.parent().child('settings/private').val() ==== false"
-        .read: "^myMessageRef.settings.private === false"
+       #.read: data.parent().child('settings/private').val() ==== false
+        .read: ^myMessageRef.settings.private === false
       meta:
         info:
-         #.read: "data.parent().parent().child('settings/private').val() ==== false"
-          .read: "^myMessageRef.settings.private === false"
+         #.read: data.parent().parent().child('settings/private').val() ==== false
+          .read: ^myMessageRef.settings.private === false
       settings:
         private:
           .validate: next.isBoolean()
@@ -130,7 +130,7 @@ rules:
     $message:
       # no need to specify .refs
       title:
-        .read: "^$message.settings.private === false"
+        .read: ^$message.settings.private === false
       settings:
         private:
           .validate: next.isBoolean()
@@ -143,10 +143,10 @@ rules:
   messages:
     $message:
       title:
-       #.read: "data.parent().child('settings/private').val() ==== false"
-        .read: "^$message.settings.private === false"
-       #.write: "newData.parent().child('settings/private').val() ==== false"
-        .write: "^$message(next).settings.private === false"
+       #.read: data.parent().child('settings/private').val() ==== false
+        .read: ^$message.settings.private === false
+       #.write: newData.parent().child('settings/private').val() ==== false
+        .write: ^$message(next).settings.private === false
       settings:
         private:
           .validate: next.isBoolean()

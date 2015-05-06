@@ -5,11 +5,11 @@ const yaml = require('js-yaml');
 
 const {
   getOptions,
-  coerceVal,
   replaceRefs,
   replaceFunctions,
-  replaceBrackets,
+  replaceChildSyntax,
   replaceKeywords,
+  coerceVal,
   parse
 } = require('../lib/rules');
 
@@ -97,20 +97,6 @@ describe('rules', () => {
       });
     });
   });
-  describe('#coerceVal()', () => {
-    it('only matches (next|prev|root)', () => {
-      expect(coerceVal('foobar')).to.equal('foobar');
-      expect(coerceVal('root')).not.to.equal('root');
-    });
-    it('appends .val() when necessary', () => {
-       expect(coerceVal('next.foo')).to.equal('next.foo.val()');
-       expect(coerceVal('next.foo.bar')).to.equal('next.foo.bar.val()');
-       expect(coerceVal('next.foo["bar"]')).to.equal('next.foo["bar"].val()');
-       expect(coerceVal('next.foo === next.bar')).to.equal('next.foo.val() === next.bar.val()');
-       expect(coerceVal('next.hasChild()')).to.equal('next.hasChild()');
-       expect(coerceVal('next.val()')).to.equal('next.val()');
-    });
-  });
   describe('#replaceRefs()', () => {
     it('replaced ^REF_NAME', () => {
       let options = {'.refs':{chat:{value:'next',depth:0}}}
@@ -150,6 +136,21 @@ describe('rules', () => {
           name: 'complex',
           body: 'next === a && prev == b || c === b',
           args: ['a', 'b', 'c']
+        },
+        'chatHasUser(chat)': {
+          name: 'chatHasUser',
+          body: 'root.users[user].hasChild(auth.uid) && user === true',
+          args: ['user']
+        },
+        'isUser(user)': {
+          name: 'isUser',
+          body: 'user === auth.uid',
+          args: ['user']
+        },
+        'getUser': {
+          name: 'getUser',
+          body: 'root.chats[chat].users[auth.uid]',
+          args: ['chat']
         }
       };
     });
@@ -157,22 +158,29 @@ describe('rules', () => {
       expect(replaceFunctions('simple()', options)).to.equal('myValue');
       expect(replaceFunctions('hasUser($user)', options)).to.equal('auth.uid === $user');
       expect(replaceFunctions('complex(1,2,3)', options)).to.equal('next === 1 && prev == 2 || 3 === 2');
+      expect(replaceFunctions('chatHasUser($user)', options)).to.equal('root.users[$user].hasChild(auth.uid) && $user === true');
+      expect(replaceFunctions('isUser($user)', options)).to.equal('$user === auth.uid');
+      expect(replaceFunctions('getUser($chat)', options)).to.equal('root.chats[$chat].users[auth.uid]');
     });
   });
-  describe('#replaceBrackets()', () => {
+  describe('#replaceChildSyntax()', () => {
     it('ignores function calls', () => {
-      expect(replaceBrackets('next.foo().bar()')).to.equal('next.foo().bar()');
+      expect(replaceChildSyntax('next.foo().bar()')).to.equal('next.foo().bar()');
     });
     it('replaces dot syntax', () => {
-      expect(replaceBrackets('next.foo')).to.equal(`next.child('foo')`);
-      expect(replaceBrackets('next.foo.bar')).to.equal(`next.child('foo').child('bar')`);
-      expect(replaceBrackets('next.foo().bar')).to.equal(`next.foo().child('bar')`);
+      expect(replaceChildSyntax('next.foo')).to.equal(`next.child('foo').val()`);
+      expect(replaceChildSyntax('next.foo.bar')).to.equal(`next.child('foo').child('bar').val()`);
+      expect(replaceChildSyntax('next.foo().bar')).to.equal(`next.foo().child('bar').val()`);
     });
     it('replaces bracket syntax', () => {
-      expect(replaceBrackets(`next['foo']`)).to.equal(`next.child('foo')`);
-      expect(replaceBrackets(`next['foo']['bar']`)).to.equal(`next.child('foo').child('bar')`);
-      expect(replaceBrackets(`next[$foo][$bar]`)).to.equal(`next.child($foo).child($bar)`);
-      expect(replaceBrackets(`root.games[$game].players.hasChild(auth.uid)`)).to.equal(`root.child('games').child($game).child('players').hasChild(auth.uid)`);
+      expect(replaceChildSyntax(`next['foo']`)).to.equal(`next.child('foo').val()`);
+      expect(replaceChildSyntax(`next['foo']['bar']`)).to.equal(`next.child('foo').child('bar').val()`);
+      expect(replaceChildSyntax(`next[$foo][$bar]`)).to.equal(`next.child($foo).child($bar).val()`);
+    });
+    it('replaces dot and bracket syntax', () => {
+      expect(replaceChildSyntax(`root.chats[$chat].users.hasChild(auth.uid)`)).to.equal(`root.child('chats').child($chat).child('users').hasChild(auth.uid)`);
+      expect(replaceChildSyntax(`root.chats[$chat].users[auth.uid]`)).to.equal(`root.child('chats').child($chat).child('users').child(auth.uid).val()`);
+      expect(replaceChildSyntax(`root.users[user].chats.hasChild(root.chats[chat])`)).to.equal(`root.child('users').child(user).child('chats').hasChild(root.child('chats').child(chat).val())`);
     });
   });
   describe('#replaceKeywords()', () => {
@@ -181,6 +189,21 @@ describe('rules', () => {
       expect(replaceKeywords('next.')).to.equal('newData.');
       expect(replaceKeywords('prev.foo.bar')).to.equal('data.foo.bar');
       expect(replaceKeywords('next.foo.bar')).to.equal('newData.foo.bar');
+    });
+  });
+  describe('#coerceVal()', () => {
+    it('only matches (next|prev|root)', () => {
+      expect(coerceVal('foobar')).to.equal('foobar');
+      expect(coerceVal('root')).not.to.equal('root');
+    });
+    it('appends .val() when necessary', () => {
+       expect(coerceVal('next.foo')).to.equal('next.foo.val()');
+       expect(coerceVal('next.foo.bar')).to.equal('next.foo.bar.val()');
+       expect(coerceVal('next.foo["bar"]')).to.equal('next.foo["bar"].val()');
+       expect(coerceVal('next.foo === next.bar')).to.equal('next.foo.val() === next.bar.val()');
+       expect(coerceVal('^myRef.foo === next.bar')).to.equal('^myRef.foo.val() === next.bar.val()');
+       expect(coerceVal('next.hasChild()')).to.equal('next.hasChild()');
+       expect(coerceVal('next.val()')).to.equal('next.val()');
     });
   });
   describe('#parse()', () => {
