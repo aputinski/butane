@@ -40,7 +40,7 @@ butane rules.yaml rules.json
 
 ## Functions
 
-Common expressions for reuse are defined in the `.functions` list.
+Common expressions for reuse are defined in the `.functions` map.
 
 ```yaml
 .functions:
@@ -103,7 +103,7 @@ next.counter == prev.counter + 1
 
 ## References
 
-References to commonly used nodes are defined in the `.refs` list.
+References to commonly used nodes are defined in the `.refs` map.
 
 They can then be accessed by using the `^` symbol.
 
