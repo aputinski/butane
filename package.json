@@ -1,0 +1,29 @@
+{
+  "name": "butane",
+  "version": "0.1.0",
+  "description": "A simple Firebase Security Rules preprocessor",
+  "keywords": [
+    "firebase"
+  ],
+  "author": "Adam Putinski",
+  "main": "dist/index.js",
+  "bin": {
+    "butane": "./bin/butane.js"
+  },
+  "scripts": {
+    "test": "mocha --compilers js:babel/register test/*.js",
+    "dist": "rm -rf dist && babel lib --out-dir dist"
+  },
+  "dependencies": {
+    "js-yaml": "3.3.0",
+    "lodash": "3.8.0",
+    "minimist": "1.1.1"
+  },
+  "devDependencies": {
+    "babel": "5.2.12",
+    "babel-runtime": "5.2.12",
+    "chai": "2.3.0",
+    "mocha": "2.2.4"
+  },
+  "license": "MIT"
+}

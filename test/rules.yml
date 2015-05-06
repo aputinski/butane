@@ -1,0 +1,49 @@
+rules:
+
+  .functions:
+    isAuthed(): auth !== null
+    hasGame(game): root['games'].hasChild(game)
+    hasPlayer(game): root.games[game].players.hasChild(auth.uid)
+    getPlayer(game): root.games[game].players[auth.uid]
+    createOnly(): "!prev.exists() && next.exists()"
+
+  cards:
+    .read: isAuthed()
+
+  games:
+    $game:
+
+      __timestamp:
+        .read: "next === 12345"
+        .write: true
+
+      cards:
+        .read: hasPlayer($game)
+        .write: hasPlayer($game)
+
+      players:
+        $player:
+          .read: hasPlayer($game)
+          # 1. The game exists
+          # 2. The game hasn't started
+          # 3. The player key === auth.uid
+          # 4. The player is available
+          .write: hasGame($game) &&
+                  ^$game['settings/started'] === false &&
+                  $player == auth.uid &&
+                  (!prev.exists() || next === true) &&
+                  newData.exits()
+          name:
+            .validate: next.isString()
+          cards:
+            .write: $player === auth.uid
+
+      player-names: 
+        .read: hasPlayer($game)
+        $player:
+          # 1. Auth
+          # 2. The authed player hasn't already created a name
+          # 3. The name is available
+          .write: isAuthed() &&
+                  (!hasPlayer($game) || getPlayer($game) === true) &&
+                  createOnly()

@@ -1,0 +1,5 @@
+node_modules
+rules.json
+rules.fbs
+dist/
+npm-debug.log
