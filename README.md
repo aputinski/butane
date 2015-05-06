@@ -1,5 +1,8 @@
 # Butane
 
+[![Build Status][travis-image]][travis-url]
+[![NPM version][npm-image]][npm-url]
+
 Butane is simplified version of the offical Firebase
 [Blaze Compiler](https://github.com/firebase/blaze_compiler)
 
@@ -151,3 +154,9 @@ rules:
         private:
           .validate: next.isBoolean()
 ```
+
+[npm-url]: https://npmjs.org/package/react-navigation-controller
+[npm-image]: http://img.shields.io/npm/v/react-navigation-controller.svg
+
+[travis-url]: https://travis-ci.org/aputinski/react-navigation-controller
+[travis-image]: http://img.shields.io/travis/aputinski/react-navigation-controller.svg
