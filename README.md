@@ -140,7 +140,7 @@ rules:
           .validate: next.isBoolean()
 ```
 
-References can also override the provied value:
+References can also override the provided value:
 
 ```yaml
 rules:
