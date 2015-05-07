@@ -12,7 +12,7 @@ Butane is simplified version of the offical Firebase
 npm install -g butane
 ```
 
-Create a `rules.yml` containing the following code:
+Create a `rules.yaml` containing the following code:
 
 ```yaml
 .functions:

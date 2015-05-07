@@ -208,7 +208,7 @@ describe('rules', () => {
   });
   describe('#parse()', () => {
     it('parses an entire ruleset', () => {
-      const rules = fs.readFileSync(path.resolve(__dirname, 'rules.yml')).toString();
+      const rules = fs.readFileSync(path.resolve(__dirname, 'rules.yaml')).toString();
       const rulesJSON = yaml.safeLoad(rules);
       parse(rulesJSON);
       const expectedJSON = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'rules.json')).toString());
