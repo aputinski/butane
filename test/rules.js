@@ -7,9 +7,9 @@ const {
   getOptions,
   replaceRefs,
   replaceFunctions,
+  coerceVal,
   replaceChildSyntax,
   replaceFirebaseIdentifiers,
-  coerceVal,
   parse
 } = require('../lib/rules');
 
@@ -187,9 +187,29 @@ describe('rules', () => {
       expect(replaceFunctions('getChatUser($chat)', options).code).to.equal('root.chats[$chat].users[auth.uid]');
     });
   });
+  describe('#coerceVal()', () => {
+    it('only matches Firebase identifiers', () => {
+      expect(coerceVal('next').code).to.equal('next.val()');
+      expect(coerceVal('foobar').code).to.equal('foobar');
+      expect(coerceVal('root').code).to.equal('root.val()');
+    });
+    it('appends .val() to Identifiers / MemberExpressions', () => {
+       expect(coerceVal('next.foo').code).to.equal('next.foo.val()');
+       expect(coerceVal('next.foo.bar').code).to.equal('next.foo.bar.val()');
+       expect(coerceVal(`next.foo['bar']`).code).to.equal(`next.foo['bar'].val()`);
+       expect(coerceVal('next.foo === next.bar').code).to.equal('next.foo.val() === next.bar.val()');
+    });
+    it(`doesn't append .val() to CallExpressions`, () => {
+      expect(coerceVal('next.hasChild()').code).to.equal('next.hasChild()');
+      expect(coerceVal('next.val()').code).to.equal('next.val()');
+    });
+  });
   describe('#replaceChildSyntax()', () => {
     it('ignores function calls', () => {
       expect(replaceChildSyntax('next.foo().bar()').code).to.equal('next.foo().bar()');
+    });
+    it('ignores certain identifiers', () => {
+      expect(replaceChildSyntax('$player === auth.uid').code).to.equal('$player === auth.uid');
     });
     it('replaces dot syntax', () => {
       expect(replaceChildSyntax('next.foo').code).to.equal(`next.child('foo')`);
@@ -218,21 +238,6 @@ describe('rules', () => {
       expect(replaceFirebaseIdentifiers('prev.foo.bar').code).to.equal('data.foo.bar');
       expect(replaceFirebaseIdentifiers('next.foo.bar').code).to.equal('newData.foo.bar');
       expect(replaceFirebaseIdentifiers('next.foo.hasChild(prev.bar)').code).to.equal('newData.foo.hasChild(data.bar)');
-    });
-  });
-  describe('#coerceVal()', () => {
-    it('only matches (next|prev|root)', () => {
-      expect(coerceVal('foobar')).to.equal('foobar');
-      expect(coerceVal('root')).not.to.equal('root');
-    });
-    it('appends .val() when necessary', () => {
-       expect(coerceVal('next.foo')).to.equal('next.foo.val()');
-       expect(coerceVal('next.foo.bar')).to.equal('next.foo.bar.val()');
-       expect(coerceVal('next.foo["bar"]')).to.equal('next.foo["bar"].val()');
-       expect(coerceVal('next.foo === next.bar')).to.equal('next.foo.val() === next.bar.val()');
-       expect(coerceVal('^myRef.foo === next.bar')).to.equal('^myRef.foo.val() === next.bar.val()');
-       expect(coerceVal('next.hasChild()')).to.equal('next.hasChild()');
-       expect(coerceVal('next.val()')).to.equal('next.val()');
     });
   });
   describe('#parse()', () => {
