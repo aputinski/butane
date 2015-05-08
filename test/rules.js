@@ -75,6 +75,29 @@ describe('rules', () => {
         depth: 0
       });
     });
+    it('throws an error for invalid .functions', () => {
+      expect(() => {
+        getOptions({
+          '.functions': {
+            'isAuthed(a,': 'auth !== null'
+          }
+        });
+      }).to.throw;
+      expect(() => {
+        getOptions({
+          '.functions': {
+            '1===2': 'auth !== null'
+          }
+        });
+      }).to.throw;
+      expect(() => {
+        getOptions({
+          '.functions': {
+            'isAuthed(a.b)': 'auth !== null'
+          }
+        });
+      }).to.throw;
+    });
     it('expands .functions', () => {
       const rules = {
         '.functions': {
@@ -103,6 +126,7 @@ describe('rules', () => {
       expect(replaceRefs('^chat', options)).to.equal('next');
       expect(replaceRefs('^chat.foo.bar', options)).to.equal('next.foo.bar');
       expect(replaceRefs('^chat.foo === ^chat.bar', options)).to.equal('next.foo === next.bar');
+      expect(replaceRefs('isUser(^chat.creator)', options)).to.equal('isUser(next.creator)');
     });
     it('appends the correct number of parent() functions', () => {
       let options = {'.refs':{chat:{value:'next',depth:0}}};
@@ -124,43 +148,43 @@ describe('rules', () => {
       options['.functions'] = {
         'simple()': {
           name: 'simple',
-          body: 'myValue',
+          body: 'a && b',
           args: []
-        },
-        'hasUser(user)': {
-          name: 'hasUser',
-          body: 'auth.uid === user',
-          args: ['user']
         },
         'complex(a,b,c)': {
           name: 'complex',
           body: 'next === a && prev == b || c === b',
           args: ['a', 'b', 'c']
         },
-        'chatHasUser(chat)': {
-          name: 'chatHasUser',
-          body: 'root.users[user].hasChild(auth.uid) && user === true',
-          args: ['user']
+        'hasUser(chat,user)': {
+          name: 'hasUser',
+          body: 'root.chats[chat].users.hasChild(user)',
+          args: ['chat', 'user']
+        },
+        'userHasChat(chat)': {
+          name: 'userHasChat',
+          body: 'root.users[auth.uid].chats.hasChild(chat) && root.chats[chat].users.hasChild(auth.uid)',
+          args: ['chat']
         },
         'isUser(user)': {
           name: 'isUser',
           body: 'user === auth.uid',
           args: ['user']
         },
-        'getUser': {
-          name: 'getUser',
+        'getChatUser(chat)': {
+          name: 'getChatUser',
           body: 'root.chats[chat].users[auth.uid]',
           args: ['chat']
         }
       };
     });
     it('replaces function calls', () => {
-      expect(replaceFunctions('simple()', options)).to.equal('myValue');
-      expect(replaceFunctions('hasUser($user)', options)).to.equal('auth.uid === $user');
+      expect(replaceFunctions('simple()', options)).to.equal('a && b');
       expect(replaceFunctions('complex(1,2,3)', options)).to.equal('next === 1 && prev == 2 || 3 === 2');
-      expect(replaceFunctions('chatHasUser($user)', options)).to.equal('root.users[$user].hasChild(auth.uid) && $user === true');
+      expect(replaceFunctions('hasUser($chat, $user)', options)).to.equal('root.chats[$chat].users.hasChild($user)');
+      expect(replaceFunctions('userHasChat(next.parent().val())', options)).to.equal('root.users[auth.uid].chats.hasChild(next.parent().val()) && root.chats[next.parent().val()].users.hasChild(auth.uid)');
       expect(replaceFunctions('isUser($user)', options)).to.equal('$user === auth.uid');
-      expect(replaceFunctions('getUser($chat)', options)).to.equal('root.chats[$chat].users[auth.uid]');
+      expect(replaceFunctions('getChatUser($chat)', options)).to.equal('root.chats[$chat].users[auth.uid]');
     });
   });
   describe('#replaceChildSyntax()', () => {

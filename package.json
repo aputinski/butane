@@ -20,6 +20,8 @@
     "prepublish": "npm run dist"
   },
   "dependencies": {
+    "escodegen": "1.6.1",
+    "esprima": "2.2.0",
     "js-yaml": "3.3.0",
     "lodash": "3.8.0",
     "minimist": "1.1.1"
