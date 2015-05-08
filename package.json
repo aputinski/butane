@@ -30,6 +30,7 @@
     "babel": "5.2.12",
     "babel-runtime": "5.2.12",
     "chai": "2.3.0",
+    "eslint": "^0.20.0",
     "mocha": "2.2.4"
   },
   "license": "MIT"
