@@ -8,7 +8,7 @@ const {
   replaceRefs,
   replaceFunctions,
   replaceChildSyntax,
-  replaceKeywords,
+  replaceFirebaseIdentifiers,
   coerceVal,
   parse
 } = require('../lib/rules');
@@ -209,12 +209,15 @@ describe('rules', () => {
       expect(replaceChildSyntax(`root.users[user].chats.hasChild(root.chats[chat])`).code).to.equal(`root.child('users').child(user).child('chats').hasChild(root.child('chats').child(chat))`);
     });
   });
-  describe('#replaceKeywords()', () => {
-    it('replaces keywords (prev|next) followed by a "."', () => {
-      expect(replaceKeywords('prev.')).to.equal('data');
-      expect(replaceKeywords('next.')).to.equal('newData.');
-      expect(replaceKeywords('prev.foo.bar')).to.equal('data.foo.bar');
-      expect(replaceKeywords('next.foo.bar')).to.equal('newData.foo.bar');
+  describe('#replaceFirebaseIdentifiers()', () => {
+    it('replaces reserved Firebase replaceFirebaseIdentifiers', () => {
+      expect(replaceFirebaseIdentifiers('prev').code).to.equal('data');
+      expect(replaceFirebaseIdentifiers('prev.prev').code).to.equal('data.prev');
+      expect(replaceFirebaseIdentifiers('next').code).to.equal('newData');
+      expect(replaceFirebaseIdentifiers('next.next').code).to.equal('newData.next');
+      expect(replaceFirebaseIdentifiers('prev.foo.bar').code).to.equal('data.foo.bar');
+      expect(replaceFirebaseIdentifiers('next.foo.bar').code).to.equal('newData.foo.bar');
+      expect(replaceFirebaseIdentifiers('next.foo.hasChild(prev.bar)').code).to.equal('newData.foo.hasChild(data.bar)');
     });
   });
   describe('#coerceVal()', () => {
