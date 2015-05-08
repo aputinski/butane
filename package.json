@@ -1,6 +1,6 @@
 {
   "name": "butane",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "A simple Firebase Security Rules preprocessor",
   "keywords": [
     "firebase"
@@ -20,6 +20,8 @@
     "prepublish": "npm run dist"
   },
   "dependencies": {
+    "escodegen": "1.6.1",
+    "esprima": "2.2.0",
     "js-yaml": "3.3.0",
     "lodash": "3.8.0",
     "minimist": "1.1.1"
@@ -28,6 +30,7 @@
     "babel": "5.2.12",
     "babel-runtime": "5.2.12",
     "chai": "2.3.0",
+    "eslint": "^0.20.0",
     "mocha": "2.2.4"
   },
   "license": "MIT"

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var argv  = require('minimist')(process.argv.slice(2));
+var argv = require('minimist')(process.argv.slice(2));
 var fireRules = require('../dist/');
 
 var input = argv._[0];

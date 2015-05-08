@@ -28,7 +28,7 @@
         "player-names": {
           ".read": "root.child('games').child($game).child('players').hasChild(auth.uid)",
           "$player": {
-            ".write": "auth !== null && (!root.child('games').child($game).child('players').hasChild(auth.uid) || root.child('games').child($game).child('players').child(auth.uid).val() === true) && !data.exists() && newData.exists()"
+            ".write": "(!root.child('games').child($game).child('players').hasChild(auth.uid) || data.parent().parent().child('settings').child('creator').val() === auth.uid) && (!data.exists() && newData.exists())"
           }
         }
       }
