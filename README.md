@@ -3,7 +3,7 @@
 [![Build Status][travis-image]][travis-url]
 [![NPM version][npm-image]][npm-url]
 
-Butane is a simplified version of the offical Firebase
+Butane is a simplified version of the official Firebase
 [Blaze Compiler](https://github.com/firebase/blaze_compiler)
 
 ##  Getting started
