@@ -179,37 +179,39 @@ describe('rules', () => {
       };
     });
     it('replaces function calls', () => {
-      expect(replaceFunctions('simple()', options)).to.equal('a && b');
-      expect(replaceFunctions('complex(1,2,3)', options)).to.equal('next === 1 && prev == 2 || 3 === 2');
-      expect(replaceFunctions('hasUser($chat, $user)', options)).to.equal('root.chats[$chat].users.hasChild($user)');
-      expect(replaceFunctions('userHasChat(next.parent().val())', options)).to.equal('root.users[auth.uid].chats.hasChild(next.parent().val()) && root.chats[next.parent().val()].users.hasChild(auth.uid)');
-      expect(replaceFunctions('isUser($user)', options)).to.equal('$user === auth.uid');
-      expect(replaceFunctions('getChatUser($chat)', options)).to.equal('root.chats[$chat].users[auth.uid]');
+      expect(replaceFunctions('simple()', options).code).to.equal('a && b');
+      expect(replaceFunctions('complex(1,2,3)', options).code).to.equal('next === 1 && prev == 2 || 3 === 2');
+      expect(replaceFunctions('hasUser($chat, $user)', options).code).to.equal('root.chats[$chat].users.hasChild($user)');
+      expect(replaceFunctions('userHasChat(next.parent().val())', options).code).to.equal('root.users[auth.uid].chats.hasChild(next.parent().val()) && root.chats[next.parent().val()].users.hasChild(auth.uid)');
+      expect(replaceFunctions('isUser($user)', options).code).to.equal('$user === auth.uid');
+      expect(replaceFunctions('getChatUser($chat)', options).code).to.equal('root.chats[$chat].users[auth.uid]');
     });
   });
   describe('#replaceChildSyntax()', () => {
     it('ignores function calls', () => {
-      expect(replaceChildSyntax('next.foo().bar()')).to.equal('next.foo().bar()');
+      expect(replaceChildSyntax('next.foo().bar()').code).to.equal('next.foo().bar()');
     });
     it('replaces dot syntax', () => {
-      expect(replaceChildSyntax('next.foo')).to.equal(`next.child('foo')`);
-      expect(replaceChildSyntax('next.foo.bar')).to.equal(`next.child('foo').child('bar')`);
-      expect(replaceChildSyntax('next.foo().bar')).to.equal(`next.foo().child('bar')`);
+      expect(replaceChildSyntax('next.foo').code).to.equal(`next.child('foo')`);
+      expect(replaceChildSyntax('next.foo.bar').code).to.equal(`next.child('foo').child('bar')`);
+      expect(replaceChildSyntax('next.foo().bar').code).to.equal(`next.foo().child('bar')`);
     });
     it('replaces bracket syntax', () => {
-      expect(replaceChildSyntax(`next['foo']`)).to.equal(`next.child('foo')`);
-      expect(replaceChildSyntax(`next['foo']['bar']`)).to.equal(`next.child('foo').child('bar')`);
-      expect(replaceChildSyntax(`next[$foo][$bar]`)).to.equal(`next.child($foo).child($bar)`);
+      expect(replaceChildSyntax(`next['foo']`).code).to.equal(`next.child('foo')`);
+      expect(replaceChildSyntax(`next['foo']['bar']`).code).to.equal(`next.child('foo').child('bar')`);
+      expect(replaceChildSyntax(`next[$foo][$bar]`).code).to.equal(`next.child($foo).child($bar)`);
     });
-    it.only('replaces dot and bracket syntax', () => {
-      expect(replaceChildSyntax(`root.chats[$chat].users.hasChild(auth.uid)`)).to.equal(`root.child('chats').child($chat).child('users').hasChild(auth.uid)`);
-      //expect(replaceChildSyntax(`root.chats[$chat].users[auth.uid]`)).to.equal(`root.child('chats').child($chat).child('users').child(auth.uid)`);
-      //expect(replaceChildSyntax(`root.users[user].chats.hasChild(root.chats[chat])`)).to.equal(`root.child('users').child(user).child('chats').hasChild(root.child('chats').child(chat))`);
+    it('replaces dot and bracket syntax', () => {
+      expect(replaceChildSyntax(`root.chats[$chat].users.hasChild(auth.uid)`).code).to.equal(`root.child('chats').child($chat).child('users').hasChild(auth.uid)`);
+      expect(replaceChildSyntax(`root.chats[$chat].users[auth.uid]`).code).to.equal(`root.child('chats').child($chat).child('users').child(auth.uid)`);
+      expect(replaceChildSyntax(`root.chats[$chat].users[next.foo]`).code).to.equal(`root.child('chats').child($chat).child('users').child(next.child('foo'))`);
+      expect(replaceChildSyntax(`root.chats[$chat].users[next.foo]`).code).to.equal(`root.child('chats').child($chat).child('users').child(next.child('foo'))`);
+      expect(replaceChildSyntax(`root.users[user].chats.hasChild(root.chats[chat])`).code).to.equal(`root.child('users').child(user).child('chats').hasChild(root.child('chats').child(chat))`);
     });
   });
   describe('#replaceKeywords()', () => {
     it('replaces keywords (prev|next) followed by a "."', () => {
-      expect(replaceKeywords('prev.')).to.equal('data.');
+      expect(replaceKeywords('prev.')).to.equal('data');
       expect(replaceKeywords('next.')).to.equal('newData.');
       expect(replaceKeywords('prev.foo.bar')).to.equal('data.foo.bar');
       expect(replaceKeywords('next.foo.bar')).to.equal('newData.foo.bar');
