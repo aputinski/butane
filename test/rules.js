@@ -203,6 +203,9 @@ describe('rules', () => {
       expect(coerceVal('next.hasChild()').code).to.equal('next.hasChild()');
       expect(coerceVal('next.val()').code).to.equal('next.val()');
     });
+    it(`doesn't append .val() if .val() already exists`, () => {
+      expect(coerceVal('next.val().length').code).to.equal('next.val().length');      
+    });
   });
   describe('#replaceChildSyntax()', () => {
     it('ignores function calls', () => {
