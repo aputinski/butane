@@ -192,19 +192,19 @@ describe('rules', () => {
       expect(replaceChildSyntax('next.foo().bar()')).to.equal('next.foo().bar()');
     });
     it('replaces dot syntax', () => {
-      expect(replaceChildSyntax('next.foo')).to.equal(`next.child('foo').val()`);
-      expect(replaceChildSyntax('next.foo.bar')).to.equal(`next.child('foo').child('bar').val()`);
-      expect(replaceChildSyntax('next.foo().bar')).to.equal(`next.foo().child('bar').val()`);
+      expect(replaceChildSyntax('next.foo')).to.equal(`next.child('foo')`);
+      expect(replaceChildSyntax('next.foo.bar')).to.equal(`next.child('foo').child('bar')`);
+      expect(replaceChildSyntax('next.foo().bar')).to.equal(`next.foo().child('bar')`);
     });
     it('replaces bracket syntax', () => {
-      expect(replaceChildSyntax(`next['foo']`)).to.equal(`next.child('foo').val()`);
-      expect(replaceChildSyntax(`next['foo']['bar']`)).to.equal(`next.child('foo').child('bar').val()`);
-      expect(replaceChildSyntax(`next[$foo][$bar]`)).to.equal(`next.child($foo).child($bar).val()`);
+      expect(replaceChildSyntax(`next['foo']`)).to.equal(`next.child('foo')`);
+      expect(replaceChildSyntax(`next['foo']['bar']`)).to.equal(`next.child('foo').child('bar')`);
+      expect(replaceChildSyntax(`next[$foo][$bar]`)).to.equal(`next.child($foo).child($bar)`);
     });
-    it('replaces dot and bracket syntax', () => {
+    it.only('replaces dot and bracket syntax', () => {
       expect(replaceChildSyntax(`root.chats[$chat].users.hasChild(auth.uid)`)).to.equal(`root.child('chats').child($chat).child('users').hasChild(auth.uid)`);
-      expect(replaceChildSyntax(`root.chats[$chat].users[auth.uid]`)).to.equal(`root.child('chats').child($chat).child('users').child(auth.uid).val()`);
-      expect(replaceChildSyntax(`root.users[user].chats.hasChild(root.chats[chat])`)).to.equal(`root.child('users').child(user).child('chats').hasChild(root.child('chats').child(chat).val())`);
+      //expect(replaceChildSyntax(`root.chats[$chat].users[auth.uid]`)).to.equal(`root.child('chats').child($chat).child('users').child(auth.uid)`);
+      //expect(replaceChildSyntax(`root.users[user].chats.hasChild(root.chats[chat])`)).to.equal(`root.child('users').child(user).child('chats').hasChild(root.child('chats').child(chat))`);
     });
   });
   describe('#replaceKeywords()', () => {
