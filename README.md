@@ -12,15 +12,18 @@ Butane is a simplified version of the official Firebase
 npm install -g butane
 ```
 
-Create a `rules.yaml` containing the following code:
+Create a `rules.yaml` file containing the following code:
 
 ```yaml
 .functions:
   isAuthed(): auth !== null
+  createOnly(): "!prev.exists() && next.exists()"
 
 rules:
-  .read: isAuthed()
-  .write: isAuthed()
+  chats:
+    $chat:
+      .read: true
+      .write: isAuthed() && createOnly()
 ```
 
 Now compile it from the command line:
@@ -32,15 +35,19 @@ butane rules.yaml rules.json
 ```json
 {
   "rules": {
-    ".read": "auth !== null",
-    ".write": "auth !== null"
+    "chats": {
+      "$chat": {
+        ".read": true,
+        ".write": "auth !== null && (newData.exists() && !data.exists())"
+      }
+    }
   }
 }
 ```
 
 ## Functions
 
-Common expressions for reuse are defined in the `.functions` map.
+Commonly used expressions are defined in the `.functions` map.
 
 ```yaml
 .functions:
@@ -54,36 +61,36 @@ You can then use them anywhere a security expression would be expected.
 
 ## Simple Security Expressions
 
-Security expressions are the strings that used to go in write/read/validate
-portions of the old security rules.
+Security expressions are the strings that go in `.write/.read/.validate`
+values of security rules.
 
-Butane expressions have similar semantics but shorter syntax.
+Butane expressions have similar semantics, but shorter syntax.
 
-### Variables renamed
+### Renamed Variables
 
-`data` and `newData` have been renamed to `prev` and `next`. `root` has
-the same meaning.
+Some predefined variables have been renamed for clarity:
 
-### Child selection
+| Old Name  | New Name  |
+| :-------- |:---------:|
+| data      | prev      |
+| newData   | next      |
 
-The expression for selecting a child is now an array-like syntax. What was:
+### Child Selection
 
-```
+The expression for selecting a child is now an array-like syntax:
+
+```javascriot
+// Old
 root.child('users')
-```
 
-is now
-
-```
+// New:
 root['users']
 ```
 
 In the common case that you are selecting a child using a single literal,
 you can select the child as if it were a property.
 
-So you can also write the above as:
-
-```
+```javascript
 root.users
 ```
 
@@ -93,11 +100,10 @@ In the new syntax, `.val()` is inserted if the expression is next to an operator
 or in an array like child selector. You only need to use `.val()` if you
 are using a method of a value type like `.length`, `.beginsWith()`, `.contains(...)`.
 
-```
+```javascript
+// Old
 newData.child('counter').val() == data.child('counter').val() + 1
-```
-is simplified to just
-```
+// New
 next.counter == prev.counter + 1
 ```
 
@@ -114,11 +120,11 @@ rules:
       .refs:
         myMessageRef: prev
       title:
-       #.read: data.parent().child('settings/private').val() ==== false
+       #.read: data.parent().child('settings').child('private').val() ==== false
         .read: ^myMessageRef.settings.private === false
       meta:
         info:
-         #.read: data.parent().parent().child('settings/private').val() ==== false
+         #.read: data.parent().parent().child('settings').child('private').val() ==== false
           .read: ^myMessageRef.settings.private === false
       settings:
         private:
