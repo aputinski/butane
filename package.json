@@ -17,7 +17,8 @@
   "scripts": {
     "test": "mocha --compilers js:babel/register test/*.js",
     "dist": "rm -rf dist && babel lib --out-dir dist",
-    "prepublish": "npm run dist"
+    "prepublish": "npm run dist",
+    "lint": "./node_modules/.bin/eslint ./"
   },
   "dependencies": {
     "escodegen": "1.6.1",
