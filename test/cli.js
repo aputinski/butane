@@ -7,6 +7,9 @@ const local = path.resolve.bind(path, __dirname);
 const cwd = path.resolve(__dirname, '..');
 
 describe('CLI', () => {
+  before(function(done) {
+    exec('npm run dist', {cwd}, done);
+  });
   after(function () {
     const output = local('rules.json.ignore');
     if (fs.existsSync(output)) {

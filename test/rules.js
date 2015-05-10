@@ -198,6 +198,8 @@ describe('rules', () => {
        expect(coerceVal('next.foo.bar').code).to.equal('next.foo.bar.val()');
        expect(coerceVal(`next.foo['bar']`).code).to.equal(`next.foo['bar'].val()`);
        expect(coerceVal('next.foo === next.bar').code).to.equal('next.foo.val() === next.bar.val()');
+       expect(coerceVal('next.foo === next.bar').code).to.equal('next.foo.val() === next.bar.val()');
+       expect(coerceVal('root.users[user].hasUser(next.bar.baz)').code).to.equal('root.users[user].hasUser(next.bar.baz.val())');
     });
     it(`doesn't append .val() to CallExpressions`, () => {
       expect(coerceVal('next.hasChild()').code).to.equal('next.hasChild()');
@@ -230,6 +232,10 @@ describe('rules', () => {
       expect(replaceChildSyntax(`root.chats[$chat].users[next.foo]`).code).to.equal(`root.child('chats').child($chat).child('users').child(next.child('foo'))`);
       expect(replaceChildSyntax(`root.chats[$chat].users[next.foo]`).code).to.equal(`root.child('chats').child($chat).child('users').child(next.child('foo'))`);
       expect(replaceChildSyntax(`root.users[user].chats.hasChild(root.chats[chat])`).code).to.equal(`root.child('users').child(user).child('chats').hasChild(root.child('chats').child(chat))`);
+    });
+    it('replaces dot and bracket syntax inside function arguments ', () => {
+      expect(replaceChildSyntax('next.foo.bar.val()').code).to.equal(`next.child('foo').child('bar').val()`);
+      expect(replaceChildSyntax('next.hasChild(next.foo.bar.val())').code).to.equal(`next.hasChild(next.child('foo').child('bar').val())`);
     });
   });
   describe('#replaceFirebaseIdentifiers()', () => {
