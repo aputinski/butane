@@ -22,6 +22,7 @@
   "dependencies": {
     "clone": "~1.0.2",
     "core-js": "~0.9.7",
+    "deep-extend": "~0.4.0",
     "escodegen": "1.6.1",
     "esprima": "2.2.0",
     "js-yaml": "3.3.0",
