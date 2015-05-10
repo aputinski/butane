@@ -15,25 +15,30 @@
     "butane": "./bin/butane.js"
   },
   "scripts": {
-    "test": "npm run dist && mocha --compilers js:babel/register test/*.js",
+    "test": "standard && npm run dist && mocha --compilers js:babel/register test/*.js",
     "dist": "rm -rf dist && babel lib --out-dir dist",
-    "prepublish": "npm run dist",
-    "lint": "./node_modules/.bin/eslint ./"
+    "prepublish": "npm run dist"
   },
   "dependencies": {
+    "core-js": "~0.9.7",
     "escodegen": "1.6.1",
     "esprima": "2.2.0",
     "js-yaml": "3.3.0",
-    "lodash": "3.8.0",
+    "lodash": "^3.8.0",
     "minimist": "1.1.1"
   },
   "devDependencies": {
     "babel": "5.2.12",
     "babel-runtime": "5.2.12",
     "chai": "2.3.0",
-    "eslint": "0.20.0",
     "mocha": "2.2.4",
-    "require-relative-main": "~1.1.1"
+    "require-relative-main": "~1.1.1",
+    "standard": "~3.7.3"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "standard": {
+    "ignore": [
+      "dist/**"
+    ]
+  }
 }
