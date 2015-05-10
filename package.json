@@ -32,7 +32,8 @@
     "babel-runtime": "5.2.12",
     "chai": "2.3.0",
     "eslint": "0.20.0",
-    "mocha": "2.2.4"
+    "mocha": "2.2.4",
+    "require-relative-main": "~1.1.1"
   },
   "license": "MIT"
 }
