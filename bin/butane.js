@@ -1,3 +1,3 @@
 #!/usr/bin/env node
 
-require('../dist/cli');
+require('require-relative-main')('./cli', __dirname)
