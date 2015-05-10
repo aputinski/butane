@@ -15,7 +15,7 @@
     "butane": "./bin/butane.js"
   },
   "scripts": {
-    "test": "mocha --compilers js:babel/register test/*.js",
+    "test": "npm run dist && mocha --compilers js:babel/register test/*.js",
     "dist": "rm -rf dist && babel lib --out-dir dist",
     "prepublish": "npm run dist",
     "lint": "./node_modules/.bin/eslint ./"
