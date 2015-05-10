@@ -20,6 +20,7 @@
     "prepublish": "npm run dist"
   },
   "dependencies": {
+    "clone": "~1.0.2",
     "core-js": "~0.9.7",
     "escodegen": "1.6.1",
     "esprima": "2.2.0",
