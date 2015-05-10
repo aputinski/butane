@@ -106,13 +106,11 @@ describe('rules', () => {
         }
       };
       let options = getOptions(rules);
-      expect(options['.functions']).to.have.ownProperty('isAuthed(a,b)');
       expect(options['.functions']['isAuthed(a,b)']).eql({
         body: 'auth !== null',
         name: 'isAuthed',
         args: ['a', 'b']
       });
-      expect(options['.functions']).to.have.ownProperty('isActive()');
       expect(options['.functions']['isActive()']).eql({
         body: 'active === true',
         name: 'isActive',
@@ -175,7 +173,17 @@ describe('rules', () => {
           name: 'getChatUser',
           body: 'root.chats[chat].users[auth.uid]',
           args: ['chat']
-        }
+        },
+        'isPopular(chat,user)': {
+          name: 'isPopular',
+          body: 'hasUser(chat,user)',
+          args: ['chat', 'user']
+        },
+        'isRecent(chat)': {
+          name: 'isRecent',
+          body: 'next.timestamp > 10 && isPopular(chat,auth.uid)',
+          args: ['chat']
+        },
       };
     });
     it('replaces function calls', () => {
@@ -185,6 +193,10 @@ describe('rules', () => {
       expect(replaceFunctions('userHasChat(next.parent().val())', options).code).to.equal('root.users[auth.uid].chats.hasChild(next.parent().val()) && root.chats[next.parent().val()].users.hasChild(auth.uid)');
       expect(replaceFunctions('isUser($user)', options).code).to.equal('$user === auth.uid');
       expect(replaceFunctions('getChatUser($chat)', options).code).to.equal('root.chats[$chat].users[auth.uid]');
+    });
+    it('replaces nested function calls', () => {
+      expect(replaceFunctions('isPopular($myChat,$myUser)', options).code).to.equal('root.chats[$myChat].users.hasChild($myUser)');
+      expect(replaceFunctions('isRecent($myChat)', options).code).to.equal('next.timestamp > 10 && root.chats[$myChat].users.hasChild(auth.uid)');
     });
   });
   describe('#coerceVal()', () => {

@@ -17,7 +17,7 @@ Create a `rules.yaml` file containing the following code:
 ```yaml
 .functions:
   isAuthed(): auth !== null
-  createOnly(): "!prev.exists() && next.exists()"
+  createOnly(): next.exists() && !prev.exists()
 
 rules:
   chats:
@@ -56,8 +56,6 @@ Commonly used expressions are defined in the `.functions` map.
 ```
 
 You can then use them anywhere a security expression would be expected.
-
-**NOTE: functions cannot currently reference other functions.**
 
 ## Simple Security Expressions
 
