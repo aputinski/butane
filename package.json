@@ -24,7 +24,8 @@
     "esprima": "2.2.0",
     "js-yaml": "3.3.0",
     "lodash": "3.8.0",
-    "minimist": "1.1.1"
+    "minimist": "1.1.1",
+    "require-relative-main": "^1.1.0"
   },
   "devDependencies": {
     "babel": "5.2.12",
