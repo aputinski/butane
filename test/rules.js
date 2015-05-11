@@ -1,18 +1,20 @@
 'use strict'
 
-/*global describe,it*/
+/*global describe,beforeEach,it*/
 
 import {expect} from 'chai'
 import {resolve} from 'path'
 import {readFileSync} from 'fs'
 import yaml from 'js-yaml'
+
 import {
-  getOptions,
-  replaceRefs,
-  replaceFunctions,
   coerceVal,
+  getOptions,
+  registerFunction,
   replaceChildSyntax,
   replaceFirebaseIdentifiers,
+  replaceFunctions,
+  replaceRefs,
   parse
 } from '../lib/rules'
 
@@ -144,7 +146,10 @@ describe('rules', () => {
     })
   })
   describe('#replaceFunctions()', () => {
-    let options = {}
+    let options
+    beforeEach(() => {
+      options = {'.functions': {}}
+    })
     it('replaces function calls', () => {
       options['.functions'] = {
         'simple()': {
@@ -220,6 +225,20 @@ describe('rules', () => {
       }
       expect(replaceFunctions('greeting(getName())', options).code).to.equal('next.name')
       expect(replaceFunctions('greeting(getUser(auth.uid))', options).code).to.equal('root.users[auth.uid].name')
+    })
+    it('replaces registered functions', () => {
+      registerFunction('myCustomRegisterdFunction', function (snapshot, value) {
+        return `${snapshot} === "${value}"`
+      })
+      expect(replaceFunctions('myCustomRegisterdFunction("next.greeting", "hello")', options).code).to.equal(`next.greeting === 'hello'`)
+    })
+    it('replaces oneOf() functions', () => {
+      expect(() => {
+        replaceFunctions('oneOf()', options)
+      }).to.throw
+      expect(replaceFunctions('oneOf(["foo", "bar", "baz"])', options).code).to.equal(`next === 'foo' || next === 'bar' || next === 'baz'`)
+      expect(replaceFunctions('oneOf(["foo", "bar"], "prev")', options).code).to.equal(`prev === 'foo' || prev === 'bar'`)
+      expect(replaceFunctions('oneOf([true,"false"])', options).code).to.equal(`next === true || next === 'false'`)
     })
   })
   describe('#coerceVal()', () => {

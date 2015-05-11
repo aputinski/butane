@@ -21,9 +21,15 @@ rules:
   games:
     $game:
 
-      __timestamp:
-        .read: next === 12345
-        .write: true
+      settings:
+        timestamp:
+          .read: next === 12345
+          .write: true
+        started:
+          .write: oneOf(true,false)
+
+      meta:
+        .write: oneOf(['foo','bar'], 'next.title')
 
       cards:
         .read: hasPlayer($game)

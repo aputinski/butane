@@ -5,9 +5,17 @@
     },
     "games": {
       "$game": {
-        "__timestamp": {
-          ".read": "newData.val() === 12345",
-          ".write": true
+        "settings": {
+          "timestamp": {
+            ".read": "newData.val() === 12345",
+            ".write": true
+          },
+          "started": {
+            ".write": "newData.val() === true || newData.val() === false"
+          }
+        },
+        "meta": {
+          ".write": "newData.child('title').val() === 'foo' || newData.child('title').val() === 'bar'"
         },
         "cards": {
           ".read": "root.child('games').child($game).child('players').hasChild(auth.uid)",

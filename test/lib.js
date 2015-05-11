@@ -5,11 +5,17 @@
 import {expect} from 'chai'
 import {resolve} from 'path'
 import {existsSync, unlinkSync} from 'fs'
-import {convert} from '../lib'
+import {convert, registerFunction} from '../lib'
 
 const local = resolve.bind(null, __dirname)
 
 describe('lib', () => {
+  describe('#registerFunction()', () => {
+    it('returns the name of registered function', () => {
+      const name = registerFunction('MyCustomFunction', function () {})
+      expect(name).to.equal('MyCustomFunction')
+    })
+  })
   describe('#convert()', () => {
     after(() => {
       const output = local('rules.json.ignore')
