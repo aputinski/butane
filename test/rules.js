@@ -1,6 +1,6 @@
 'use strict'
 
-/*global describe,before,it*/
+/*global describe,it*/
 
 import {expect} from 'chai'
 import {resolve} from 'path'
@@ -145,11 +145,11 @@ describe('rules', () => {
   })
   describe('#replaceFunctions()', () => {
     let options = {}
-    before(() => {
+    it('replaces function calls', () => {
       options['.functions'] = {
         'simple()': {
           name: 'simple',
-          body: 'a && b',
+          body: 'next.exists()',
           args: []
         },
         'complex(a,b,c)': {
@@ -176,21 +176,9 @@ describe('rules', () => {
           name: 'getChatUser',
           body: 'root.chats[chat].users[auth.uid]',
           args: ['chat']
-        },
-        'isPopular(chat,user)': {
-          name: 'isPopular',
-          body: 'hasUser(chat,user)',
-          args: ['chat', 'user']
-        },
-        'isRecent(chat)': {
-          name: 'isRecent',
-          body: 'next.timestamp > 10 && isPopular(chat,auth.uid)',
-          args: ['chat']
         }
       }
-    })
-    it('replaces function calls', () => {
-      expect(replaceFunctions('simple()', options).code).to.equal('a && b')
+      expect(replaceFunctions('simple()', options).code).to.equal('next.exists()')
       expect(replaceFunctions('complex(1,2,3)', options).code).to.equal('next === 1 && prev == 2 || 3 === 2')
       expect(replaceFunctions('hasUser($chat, $user)', options).code).to.equal('root.chats[$chat].users.hasChild($user)')
       expect(replaceFunctions('userHasChat(next.parent().val())', options).code).to.equal('root.users[auth.uid].chats.hasChild(next.parent().val()) && root.chats[next.parent().val()].users.hasChild(auth.uid)')
@@ -198,8 +186,40 @@ describe('rules', () => {
       expect(replaceFunctions('getChatUser($chat)', options).code).to.equal('root.chats[$chat].users[auth.uid]')
     })
     it('replaces nested function calls', () => {
-      expect(replaceFunctions('isPopular($myChat,$myUser)', options).code).to.equal('root.chats[$myChat].users.hasChild($myUser)')
-      expect(replaceFunctions('isRecent($myChat)', options).code).to.equal('next.timestamp > 10 && root.chats[$myChat].users.hasChild(auth.uid)')
+      options['.functions'] = {
+        'isString(snapshot)': {
+          name: 'isString',
+          body: 'snapshot.isString()',
+          args: ['snapshot']
+        },
+        'b(snapshot)': {
+          name: 'b',
+          body: 'isString(snapshot)',
+          args: ['snapshot']
+        }
+      }
+      expect(replaceFunctions('b(prev)', options).code).to.equal('prev.isString()')
+    })
+    it('replaces argument function calls', () => {
+      options['.functions'] = {
+        'greeting(name)': {
+          name: 'greeting',
+          body: 'name',
+          args: ['name']
+        },
+        'getName()': {
+          name: 'getName',
+          body: 'next.name',
+          args: []
+        },
+        'getUser()': {
+          name: 'getUser',
+          body: 'root.users[user].name',
+          args: ['user']
+        }
+      }
+      expect(replaceFunctions('greeting(getName())', options).code).to.equal('next.name')
+      expect(replaceFunctions('greeting(getUser(auth.uid))', options).code).to.equal('root.users[auth.uid].name')
     })
   })
   describe('#coerceVal()', () => {
