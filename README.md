@@ -45,18 +45,6 @@ butane rules.yaml rules.json
 }
 ```
 
-## Functions
-
-Commonly used expressions are defined in the `.functions` map.
-
-```yaml
-.functions:
-  isLoggedIn():  auth.uid !== null
-  isUser(user):  auth.uid === user
-```
-
-You can then use them anywhere a security expression would be expected.
-
 ## Simple Security Expressions
 
 Security expressions are the strings that go in `.write/.read/.validate`
@@ -72,6 +60,8 @@ Some predefined variables have been renamed for clarity:
 | :-------- |:---------:|
 | data      | prev      |
 | newData   | next      |
+
+***
 
 ### Child Selection
 
@@ -91,6 +81,8 @@ you can select the child as if it were a property.
 root.users
 ```
 
+***
+
 ### Coercion of `.val()`
 
 In the new syntax, `.val()` is inserted if the expression is next to an operator
@@ -102,6 +94,68 @@ are using a method of a value type like `.length`, `.beginsWith()`, `.contains(.
 newData.child('counter').val() === data.child('counter').val() + 1
 // New
 next.counter === prev.counter + 1
+```
+
+## Functions
+
+Commonly used expressions are defined in the `.functions` map.
+
+```yaml
+.functions:
+  isLoggedIn():  auth.uid !== null
+  isUser(user):  auth.uid === user
+rules:
+  users:
+    $user:
+      .write: isLoggedIn() && isUser($user)
+```
+
+You can then use them anywhere a security expression would be expected.
+
+### Predefined functions
+
+Butane includes a few predefined functions:
+
+#### `oneOf(keys, [snapshot])`
+
+Return an expression that requires `snapshot` to equal one of the provided `keys`
+
+**Arguments**
+
+##### `keys` `{array}`
+
+An array of possible values
+
+##### `snapshot` `{string}` `default="next"`
+
+The snapshot to check against
+
+**Example**
+
+```yaml
+rules:
+  colors:
+   #.write: next.val() === 'red' || next.val() === 'blue' || next.val() === 'green'
+    .write: oneOf(['red', 'blue', 'green'])
+  shapes:
+   #.write: root.child('colors').val() === 'red' || root.child('colors').val() === 'blue' || root.child('colors').val() === 'green'
+    .write: oneOf(['red', 'blue', 'green'], root.colors)
+```
+
+***
+
+#### `oneOf(...keys)`
+
+Shorthand version that uses the function arguments as `keys` and defaults
+to "next" as the `snapshot`
+
+**Example**
+
+```yaml
+rules:
+  colors:
+   #.write: next.val() === 'red' || next.val() === 'blue' || next.val() === 'green'
+    .write: oneOf('red', 'blue', 'green')
 ```
 
 ## References
