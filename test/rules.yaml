@@ -1,10 +1,17 @@
+# This file is a kitchen sinks of tests, and not a practical
+# security rules file.
+#
+# Please only ADD new items and update the expected result
+# in the rules.json file
+
 .functions:
   isAuthed(): auth !== null
   hasGame(game): root.games.hasChild(game)
   hasPlayer(game): root.games[game].players.hasChild(auth.uid)
   getPlayer(game): root.games[game].players[auth.uid]
   isPlayer(player): player === auth.uid
-  createOnly(): "!prev.exists() && next.exists()"
+  createOnly(): next.exists() && !prev.exists()
+  isString(snapshot, path): snapshot[path].isString()
 
 rules:
 
@@ -30,6 +37,8 @@ rules:
                   $player == auth.uid &&
                   (!prev.exists() || next === true) &&
                   newData.exits()
+          .validate: isString(next,'name')
+
           name:
             .validate: next.isString()
           cards:
