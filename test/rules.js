@@ -232,6 +232,14 @@ describe('rules', () => {
       })
       expect(replaceFunctions('myCustomRegisterdFunction("next.greeting", "hello")', options).code).to.equal(`next.greeting === 'hello'`)
     })
+    it('replaces oneOf() functions', () => {
+      expect(() => {
+        replaceFunctions('oneOf()', options)
+      }).to.throw
+      expect(replaceFunctions('oneOf(["foo", "bar", "baz"])', options).code).to.equal(`next === 'foo' || next === 'bar' || next === 'baz'`)
+      expect(replaceFunctions('oneOf(["foo", "bar"], "prev")', options).code).to.equal(`prev === 'foo' || prev === 'bar'`)
+      expect(replaceFunctions('oneOf([true,"false"])', options).code).to.equal(`next === true || next === 'false'`)
+    })
   })
   describe('#coerceVal()', () => {
     it('only matches Firebase identifiers', () => {
