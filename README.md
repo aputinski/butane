@@ -8,7 +8,7 @@ Butane is a simplified version of the official Firebase
 
 ##  Getting started
 
-```
+```bash
 npm install -g butane
 ```
 
@@ -80,7 +80,7 @@ The expression for selecting a child is now an array-like syntax:
 ```javascript
 // Old
 root.child('users')
-// New:
+// New
 root['users']
 ```
 
@@ -99,16 +99,16 @@ are using a method of a value type like `.length`, `.beginsWith()`, `.contains(.
 
 ```javascript
 // Old
-newData.child('counter').val() == data.child('counter').val() + 1
+newData.child('counter').val() === data.child('counter').val() + 1
 // New
-next.counter == prev.counter + 1
+next.counter === prev.counter + 1
 ```
 
 ## References
 
 References to commonly used nodes are defined in the `.refs` map.
 
-They can then be accessed by using the `^` symbol.
+They can be accessed using the `^` symbol.
 
 ```yaml
 rules:
@@ -117,11 +117,11 @@ rules:
       .refs:
         myMessageRef: prev
       title:
-       #.read: data.parent().child('settings').child('private').val() ==== false
+       #.read: data.parent().child('settings').child('private').val() === false
         .read: ^myMessageRef.settings.private === false
       meta:
         info:
-         #.read: data.parent().parent().child('settings').child('private').val() ==== false
+         #.read: data.parent().parent().child('settings').child('private').val() === false
           .read: ^myMessageRef.settings.private === false
       settings:
         private:
@@ -129,7 +129,7 @@ rules:
 ```
 
 Because it's common to reference `$wildcard` paths, they will automatically
-insert a `.ref` with the name of the wildcard (including the `$`)
+be inserted as a `.ref` with the name of the wildcard (including the `$`)
 
 ```yaml
 rules:
@@ -150,9 +150,9 @@ rules:
   messages:
     $message:
       title:
-       #.read: data.parent().child('settings').child('private').val() ==== false
+       #.read: data.parent().child('settings').child('private').val() === false
         .read: ^$message.settings.private === false
-       #.write: newData.parent().child('settings').child('private').val() ==== false
+       #.write: newData.parent().child('settings').child('private').val() === false
         .write: ^$message(next).settings.private === false
       settings:
         private:
