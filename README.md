@@ -77,10 +77,9 @@ Some predefined variables have been renamed for clarity:
 
 The expression for selecting a child is now an array-like syntax:
 
-```javascriot
+```javascript
 // Old
 root.child('users')
-
 // New:
 root['users']
 ```
