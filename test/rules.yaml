@@ -23,8 +23,8 @@ rules:
 
       settings:
         timestamp:
-          .read: next === 12345
-          .write: true
+          .read: true
+          .write: next === 12345
         started:
           .write: oneOf(true,false)
 
@@ -42,7 +42,7 @@ rules:
                   ^$game['settings/started'] === false &&
                   $player == auth.uid &&
                   (!prev.exists() || next === true) &&
-                  newData.exits()
+                  newData.exists()
           .validate: isString(next,'name')
 
           name:

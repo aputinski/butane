@@ -7,8 +7,8 @@
       "$game": {
         "settings": {
           "timestamp": {
-            ".read": "newData.val() === 12345",
-            ".write": true
+            ".read": true,
+            ".write": "newData.val() === 12345"
           },
           "started": {
             ".write": "newData.val() === true || newData.val() === false"
@@ -24,7 +24,7 @@
         "players": {
           "$player": {
             ".read": "root.child('games').child($game).child('players').hasChild(auth.uid)",
-            ".write": "root.child('games').hasChild($game) && data.parent().parent().child('settings/started').val() === false && $player == auth.uid && (!data.exists() || newData.val() === true) && newData.exits()",
+            ".write": "root.child('games').hasChild($game) && data.parent().parent().child('settings/started').val() === false && $player == auth.uid && (!data.exists() || newData.val() === true) && newData.exists()",
             ".validate": "newData.child('name').isString()",
             "name": {
               ".validate": "newData.isString()"
