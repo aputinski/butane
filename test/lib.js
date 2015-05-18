@@ -4,7 +4,7 @@
 
 import {expect} from 'chai'
 import {resolve} from 'path'
-import {existsSync, unlinkSync} from 'fs'
+import {readFileSync, existsSync, unlinkSync} from 'fs'
 import {convert, registerFunction} from '../lib'
 
 const local = resolve.bind(null, __dirname)
@@ -26,6 +26,11 @@ describe('lib', () => {
         convert(local('foo/bar/baz.yml'))
       })
       .to.throw(/Input \"/)
+    })
+    it(`returns the rules`, () => {
+      const rules = convert(local('rules.yaml'))
+      const expectedRules = JSON.parse(readFileSync(local('rules.json')).toString())
+      expect(rules).to.deep.equal(expectedRules)
     })
     it(`throws an error if the output directory doesn't exist`, () => {
       expect(() => {
