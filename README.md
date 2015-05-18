@@ -28,8 +28,10 @@ rules:
 
 Now compile it from the command line:
 
-```
+```bash
 butane rules.yaml rules.json
+# or copy the output to the clipboard
+butane rules.yaml | pbcopy
 ```
 
 ```json
@@ -215,9 +217,10 @@ rules:
 
 ## Node API
 
-### `convert(input, output)`
+### `convert(input, [output])`
 
-Convert a file of YAML Butane rules to JSON Firebase rules
+Convert a file of YAML Butane rules to JSON Firebase rules and optionally
+write the file to disk.
 
 **Arguments**
 
@@ -228,6 +231,12 @@ The path of the input file
 ##### `output` `{string}`
 
 The path of the output file
+
+**Returns**
+
+##### `{object}` 
+
+An object representing the converted rules
 
 **Example**
 
