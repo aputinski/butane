@@ -232,6 +232,19 @@ describe('rules', () => {
       })
       expect(replaceFunctions('myCustomRegisterdFunction("next.greeting", "hello")', options).code).to.equal(`next.greeting === 'hello'`)
     })
+    it('replaces functions inside registered functions', () => {
+      options['.functions'] = {
+        'foo(snapshot)': {
+          name: 'foo',
+          body: 'snapshot.bar === baz',
+          args: ['snapshot']
+        }
+      }
+      registerFunction('myCustomRegisterdFunction', function (snapshot, value) {
+        return `${snapshot}.hello.world === true && foo(${snapshot})`
+      })
+      expect(replaceFunctions('myCustomRegisterdFunction("next")', options).code).to.equal(`next.hello.world === true && next.bar === baz`)
+    })
     it('replaces oneOf() functions', () => {
       expect(() => {
         replaceFunctions('oneOf()', options)
