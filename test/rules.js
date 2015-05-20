@@ -281,7 +281,9 @@ describe('rules', () => {
       expect(coerceVal('root.names[next][prev]').code).to.equal('root.names[next.val()][prev.val()].val()')
       expect(coerceVal('root.names[root.foo.bar][prev][next]').code).to.equal('root.names[root.foo.bar.val()][prev.val()][next.val()].val()')
       expect(coerceVal('isUser(next.foo[prev])').code).to.equal('isUser(next.foo[prev.val()].val())')
+      expect(coerceVal('isUser(getUser(next), next)').code).to.equal('isUser(getUser(next.val()), next.val())')
       expect(coerceVal('root[next] === $player').code).to.equal('root[next.val()].val() === $player')
+      expect(coerceVal('root[next].exists()').code).to.equal('root[next.val()].exists()')
     })
     it('appends .val() to CallExpressions arguments', () => {
       expect(coerceVal('isUser(next).exists()').code).to.equal('isUser(next.val()).exists()')
