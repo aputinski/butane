@@ -267,6 +267,7 @@ describe('rules', () => {
       expect(coerceVal('next.foo === next.bar').code).to.equal('next.foo.val() === next.bar.val()')
       expect(coerceVal('next.foo === next.bar').code).to.equal('next.foo.val() === next.bar.val()')
       expect(coerceVal('root.users[user].hasUser(next.bar.baz)').code).to.equal('root.users[user].hasUser(next.bar.baz.val())')
+      expect(coerceVal('root.users[user].hasUser(next.bar.baz)').code).to.equal('root.users[user].hasUser(next.bar.baz.val())')
     })
     it(`doesn't append .val() to CallExpressions`, () => {
       expect(coerceVal('next.hasChild()').code).to.equal('next.hasChild()')
@@ -281,6 +282,11 @@ describe('rules', () => {
       expect(coerceVal('root.names[root.foo.bar][prev][next]').code).to.equal('root.names[root.foo.bar.val()][prev.val()][next.val()].val()')
       expect(coerceVal('isUser(next.foo[prev])').code).to.equal('isUser(next.foo[prev.val()].val())')
       expect(coerceVal('root[next] === $player').code).to.equal('root[next.val()].val() === $player')
+    })
+    it('appends .val() to CallExpressions arguments', () => {
+      expect(coerceVal('isUser(next).exists()').code).to.equal('isUser(next.val()).exists()')
+      expect(coerceVal('isUser(next.id).exists()').code).to.equal('isUser(next.id.val()).exists()')
+      expect(coerceVal('root.games[$game].players.hasChild(auth.uid)').code).to.equal('root.games[$game].players.hasChild(auth.uid)')
     })
   })
   describe('#replaceChildSyntax()', () => {
