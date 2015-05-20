@@ -104,19 +104,24 @@ describe('rules', () => {
       }).to.throw
     })
     it('expands .functions', () => {
+      const prevOptions = {
+        '.functions': {
+          'isAuthed()': 'auth !== null'
+        }
+      }
       const rules = {
         '.functions': {
-          'isAuthed(a,b)': 'auth !== null',
+          'isAuthed(user)': 'auth !== null && auth.uid === user',
           'isActive()': 'active === true'
         }
       }
-      let options = getOptions(rules)
-      expect(options['.functions']['isAuthed(a,b)']).to.deep.equal({
-        body: 'auth !== null',
+      let options = getOptions(rules, prevOptions)
+      expect(options['.functions']['isAuthed']).to.deep.equal({
+        body: 'auth !== null && auth.uid === user',
         name: 'isAuthed',
-        args: ['a', 'b']
+        args: ['user']
       })
-      expect(options['.functions']['isActive()']).to.deep.equal({
+      expect(options['.functions']['isActive']).to.deep.equal({
         body: 'active === true',
         name: 'isActive',
         args: []
@@ -152,32 +157,32 @@ describe('rules', () => {
     })
     it('replaces function calls', () => {
       options['.functions'] = {
-        'simple()': {
+        'simple': {
           name: 'simple',
           body: 'next.exists()',
           args: []
         },
-        'complex(a,b,c)': {
+        'complex': {
           name: 'complex',
           body: 'next === a && prev == b || c === b',
           args: ['a', 'b', 'c']
         },
-        'hasUser(chat,user)': {
+        'hasUser': {
           name: 'hasUser',
           body: 'root.chats[chat].users.hasChild(user)',
           args: ['chat', 'user']
         },
-        'userHasChat(chat)': {
+        'userHasChat': {
           name: 'userHasChat',
           body: 'root.users[auth.uid].chats.hasChild(chat) && root.chats[chat].users.hasChild(auth.uid)',
           args: ['chat']
         },
-        'isUser(user)': {
+        'isUser': {
           name: 'isUser',
           body: 'user === auth.uid',
           args: ['user']
         },
-        'getChatUser(chat)': {
+        'getChatUser': {
           name: 'getChatUser',
           body: 'root.chats[chat].users[auth.uid]',
           args: ['chat']
@@ -192,12 +197,12 @@ describe('rules', () => {
     })
     it('replaces nested function calls', () => {
       options['.functions'] = {
-        'isString(snapshot)': {
+        'isString': {
           name: 'isString',
           body: 'snapshot.isString()',
           args: ['snapshot']
         },
-        'b(snapshot)': {
+        'b': {
           name: 'b',
           body: 'isString(snapshot)',
           args: ['snapshot']
@@ -207,17 +212,17 @@ describe('rules', () => {
     })
     it('replaces argument function calls', () => {
       options['.functions'] = {
-        'greeting(name)': {
+        'greeting': {
           name: 'greeting',
           body: 'name',
           args: ['name']
         },
-        'getName()': {
+        'getName': {
           name: 'getName',
           body: 'next.name',
           args: []
         },
-        'getUser()': {
+        'getUser': {
           name: 'getUser',
           body: 'root.users[user].name',
           args: ['user']
@@ -234,7 +239,7 @@ describe('rules', () => {
     })
     it('replaces functions inside registered functions', () => {
       options['.functions'] = {
-        'foo(snapshot)': {
+        'foo': {
           name: 'foo',
           body: 'snapshot.bar === baz',
           args: ['snapshot']
