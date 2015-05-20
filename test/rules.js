@@ -275,6 +275,13 @@ describe('rules', () => {
     it(`doesn't append .val() if .val() already exists`, () => {
       expect(coerceVal('next.val().length').code).to.equal('next.val().length')
     })
+    it(`appends .val() to computed properties`, () => {
+      expect(coerceVal('root.names[next]').code).to.equal('root.names[next.val()].val()')
+      expect(coerceVal('root.names[next][prev]').code).to.equal('root.names[next.val()][prev.val()].val()')
+      expect(coerceVal('root.names[root.foo.bar][prev][next]').code).to.equal('root.names[root.foo.bar.val()][prev.val()][next.val()].val()')
+      expect(coerceVal('isUser(next.foo[prev])').code).to.equal('isUser(next.foo[prev.val()].val())')
+      expect(coerceVal('root[next] === $player').code).to.equal('root[next.val()].val() === $player')
+    })
   })
   describe('#replaceChildSyntax()', () => {
     it('ignores function calls', () => {
@@ -283,26 +290,30 @@ describe('rules', () => {
     it('ignores certain identifiers', () => {
       expect(replaceChildSyntax('$player === auth.uid').code).to.equal('$player === auth.uid')
     })
-    it('replaces dot syntax', () => {
+    it('replaces property syntax', () => {
       expect(replaceChildSyntax('next.foo').code).to.equal(`next.child('foo')`)
       expect(replaceChildSyntax('next.foo.bar').code).to.equal(`next.child('foo').child('bar')`)
       expect(replaceChildSyntax('next.foo().bar').code).to.equal(`next.foo().child('bar')`)
     })
-    it('replaces bracket syntax', () => {
+    it('replaces computed property syntax', () => {
       expect(replaceChildSyntax(`next['foo']`).code).to.equal(`next.child('foo')`)
       expect(replaceChildSyntax(`next['foo']['bar']`).code).to.equal(`next.child('foo').child('bar')`)
       expect(replaceChildSyntax(`next[$foo][$bar]`).code).to.equal(`next.child($foo).child($bar)`)
     })
-    it('replaces dot and bracket syntax', () => {
+    it('replaces property and computed property syntax', () => {
       expect(replaceChildSyntax(`root.chats[$chat].users.hasChild(auth.uid)`).code).to.equal(`root.child('chats').child($chat).child('users').hasChild(auth.uid)`)
       expect(replaceChildSyntax(`root.chats[$chat].users[auth.uid]`).code).to.equal(`root.child('chats').child($chat).child('users').child(auth.uid)`)
       expect(replaceChildSyntax(`root.chats[$chat].users[next.foo]`).code).to.equal(`root.child('chats').child($chat).child('users').child(next.child('foo'))`)
       expect(replaceChildSyntax(`root.chats[$chat].users[next.foo]`).code).to.equal(`root.child('chats').child($chat).child('users').child(next.child('foo'))`)
       expect(replaceChildSyntax(`root.users[user].chats.hasChild(root.chats[chat])`).code).to.equal(`root.child('users').child(user).child('chats').hasChild(root.child('chats').child(chat))`)
     })
-    it('replaces dot and bracket syntax inside function arguments ', () => {
+    it('replaces property and computed property syntax inside function arguments ', () => {
       expect(replaceChildSyntax('next.foo.bar.val()').code).to.equal(`next.child('foo').child('bar').val()`)
       expect(replaceChildSyntax('next.hasChild(next.foo.bar.val())').code).to.equal(`next.hasChild(next.child('foo').child('bar').val())`)
+    })
+    it('replaces property and computed property syntax inside computed properties', () => {
+      expect(replaceChildSyntax('root[next.user.val()]').code).to.equal(`root.child(next.child('user').val())`)
+      expect(replaceChildSyntax('root[next.val()]').code).to.equal(`root.child(next.val())`)
     })
   })
   describe('#replaceFirebaseIdentifiers()', () => {

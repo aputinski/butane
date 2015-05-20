@@ -21,23 +21,24 @@
           ".read": "root.child('games').child($game).child('players').hasChild(auth.uid)",
           ".write": "root.child('games').child($game).child('players').hasChild(auth.uid)"
         },
+        "names": {
+          ".read": "root.child('games').child($game).child('players').hasChild(auth.uid)",
+          "$name": {
+            ".write": "(!root.child('games').child($game).child('players').hasChild(auth.uid) || data.parent().parent().child('settings').child('creator').val() === auth.uid) && (newData.exists() && !data.exists())"
+          }
+        },
         "players": {
           "$player": {
             ".read": "root.child('games').child($game).child('players').hasChild(auth.uid)",
             ".write": "root.child('games').hasChild($game) && data.parent().parent().child('settings/started').val() === false && $player == auth.uid && (!data.exists() || newData.val() === true) && newData.exists()",
             ".validate": "newData.child('name').isString()",
             "name": {
+              ".write": "data.parent().parent().parent().child('names').child(newData.val()).val() === $player",
               ".validate": "newData.isString()"
             },
             "cards": {
               ".write": "$player === auth.uid"
             }
-          }
-        },
-        "player-names": {
-          ".read": "root.child('games').child($game).child('players').hasChild(auth.uid)",
-          "$player": {
-            ".write": "(!root.child('games').child($game).child('players').hasChild(auth.uid) || data.parent().parent().child('settings').child('creator').val() === auth.uid) && (newData.exists() && !data.exists())"
           }
         }
       }

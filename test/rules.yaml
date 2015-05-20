@@ -35,6 +35,11 @@ rules:
         .read: hasPlayer($game)
         .write: hasPlayer($game)
 
+      names:
+        .read: hasPlayer($game)
+        $name:
+          .write: (!hasPlayer($game) || isPlayer(^$game.settings.creator)) && createOnly()
+
       players:
         $player:
           .read: hasPlayer($game)
@@ -44,15 +49,8 @@ rules:
                   (!prev.exists() || next === true) &&
                   newData.exists()
           .validate: isString(next,'name')
-
           name:
+            .write: ^$game.names[next] === $player
             .validate: next.isString()
           cards:
             .write: $player === auth.uid
-
-      player-names:
-        .read: hasPlayer($game)
-
-        $player:
-          .write: (!hasPlayer($game) || isPlayer(^$game.settings.creator)) &&
-                  createOnly()
