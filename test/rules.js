@@ -195,6 +195,13 @@ describe('rules', () => {
       expect(replaceFunctions('isUser($user)', options).code).to.equal('$user === auth.uid')
       expect(replaceFunctions('getChatUser($chat)', options).code).to.equal('root.chats[$chat].users[auth.uid]')
     })
+    it('throws an error for non-existent function calls', () => {
+      options['.functions'] = {
+      }
+      expect(() => {
+        replaceFunctions('doesNotExist()', options)
+      }).to.throw(/ has not been defined/)
+    })
     it('replaces nested function calls', () => {
       options['.functions'] = {
         'isString': {
