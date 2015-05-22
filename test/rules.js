@@ -87,21 +87,21 @@ describe('rules', () => {
             'isAuthed(a,': 'auth !== null'
           }
         })
-      }).to.throw(/Invalid .function declaration: /)
+      }).to.throw('Invalid .function declaration: isAuthed(a,')
       expect(() => {
         getOptions({
           '.functions': {
             '1===2': 'auth !== null'
           }
         })
-      }).to.throw(/Invalid .function declaration: /)
+      }).to.throw('Invalid .function declaration: 1===2')
       expect(() => {
         getOptions({
           '.functions': {
             'isAuthed(a.b)': 'auth !== null'
           }
         })
-      }).to.throw(/Invalid .function declaration: /)
+      }).to.throw('Invalid .function declaration: isAuthed(a.b)')
     })
     it('expands .functions', () => {
       const prevOptions = {
@@ -253,7 +253,7 @@ describe('rules', () => {
     it('replaces oneOf() functions', () => {
       expect(() => {
         replaceFunctions('oneOf()', options)
-      }).to.throw
+      }).to.throw(Error)
       expect(replaceFunctions('oneOf(["foo", "bar", "baz"])', options).code).to.equal(`next === 'foo' || next === 'bar' || next === 'baz'`)
       expect(replaceFunctions('oneOf(["foo", "bar"], "prev")', options).code).to.equal(`prev === 'foo' || prev === 'bar'`)
       expect(replaceFunctions('oneOf([true,"false"])', options).code).to.equal(`next === true || next === 'false'`)
