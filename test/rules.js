@@ -87,21 +87,21 @@ describe('rules', () => {
             'isAuthed(a,': 'auth !== null'
           }
         })
-      }).to.throw
+      }).to.throw(/Invalid .function declaration: /)
       expect(() => {
         getOptions({
           '.functions': {
             '1===2': 'auth !== null'
           }
         })
-      }).to.throw
+      }).to.throw(/Invalid .function declaration: /)
       expect(() => {
         getOptions({
           '.functions': {
             'isAuthed(a.b)': 'auth !== null'
           }
         })
-      }).to.throw
+      }).to.throw(/Invalid .function declaration: /)
     })
     it('expands .functions', () => {
       const prevOptions = {
