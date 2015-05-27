@@ -1,6 +1,6 @@
 {
   "name": "butane",
-  "version": "2.2.6",
+  "version": "3.0.0",
   "description": "A simple Firebase Security Rules preprocessor",
   "keywords": [
     "firebase"

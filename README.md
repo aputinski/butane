@@ -217,7 +217,37 @@ rules:
 
 ## Node API
 
-### `convert(input, [output])`
+### `convert(input)`
+
+Convert a string of YAML Butane rules to a JSON string of Firebase rules
+
+**Arguments**
+
+##### `input` `{string}`
+
+A valid YAML string
+
+**Returns**
+
+##### `{string}` 
+
+An JSON string representing the converted rules
+
+**Example**
+
+```js
+import {convert} from 'butane'
+
+const rulesYamlString = `
+  rules:
+    .read: true 
+`
+
+const rulesJsonString = convert(rulesYamlString)
+const rulesJson = JSON.parse(rulesJsonString)
+```
+
+### `convertFile(input, [output])`
 
 Convert a file of YAML Butane rules to JSON Firebase rules and optionally
 write the file to disk.
@@ -236,14 +266,14 @@ The path of the output file
 
 ##### `{object}` 
 
-An object representing the converted rules
+The converted rules as a JSON object
 
 **Example**
 
 ```js
-import {convert} from 'butane'
+import {convertFile} from 'butane'
 
-convert('./rules.yaml', './rules.json')
+convertFile('./rules.yaml', './rules.json')
 ```
 
 ***
